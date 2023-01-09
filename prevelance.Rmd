@@ -1,0 +1,725 @@
+---
+title: "prevelance"
+output: word_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r pfs_mas, echo=FALSE, results='hide', warning=FALSE, include=FALSE}
+library(readr)
+library(ggplot2)
+library(meta)
+library(forestplot)
+library(stringr)
+library(readxl)
+library(tidyverse)
+library(rstatix)
+
+```
+
+
+```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
+#for prevalance table 
+neurobypass <- read_excel("cleanforcoding.xlsx")
+
+#total overall
+Totalcount <-nrow(neurobypass)
+
+Totalpreceededsubset<-subset(neurobypass, preceeded == "1")
+Totalambigioussubset<-subset(neurobypass, Ambigious == "1")
+Totalbypasssubset<-subset(neurobypass, Truebypass == "1")
+  
+Totalpreceededcount<-nrow(Totalpreceededsubset)
+Totalambigiouscount<-nrow(Totalambigioussubset)
+Totalbypasscount<-nrow(Totalbypasssubset)
+
+Totalpreceededpercent <- (divide_by(Totalpreceededcount,Totalcount))*100
+Totalambigiouspercent <- (divide_by(Totalambigiouscount,Totalcount))*100
+Totalbypasspercent <- (divide_by(Totalbypasscount,Totalcount))*100
+
+#subsets
+ADsubset <- subset(neurobypass, indication == "AD")
+PDsubset <- subset(neurobypass, indication == "PD")
+ALSsubset <- subset(neurobypass, indication == "ALS")
+HDsubset <- subset(neurobypass, indication == "Huntingtons")
+MSsubset <- subset(neurobypass, indication == "MS")
+Migrainesubset <- subset(neurobypass, indication == "Migrane")
+Headachesubset <- subset(neurobypass, indication == "Headache")
+Epilepsysubset <- subset(neurobypass, indication == "Epilepsy")
+TBIsubset <- subset(neurobypass, indication == "TBI")
+Strokesubset <- subset(neurobypass, indication == "Stroke")
+
+#totalcount
+ADcount <- nrow(ADsubset)
+PDcount <- nrow(PDsubset)
+ALScount <- nrow(ALSsubset)
+HDcount <- nrow(HDsubset)
+MScount <- nrow(MSsubset)
+Migrainecount <- nrow(Migrainesubset)
+Headachecount <- nrow(Headachesubset)
+Epilepsycount <- nrow(Epilepsysubset)
+TBIcount <- nrow(TBIsubset)
+Strokecount <- nrow(Strokesubset)
+
+#precededsubset
+ADpreceeded <- subset(ADsubset, preceeded == "1")
+PDpreceeded<- subset(PDsubset, preceeded == "1")
+ALSpreceeded <- subset(ALSsubset, preceeded == "1")
+HDpreceeded <- subset(HDsubset, preceeded == "1")
+MSpreceeded <- subset(MSsubset, preceeded == "1")
+Migrainepreceeded <- subset(Migrainesubset, preceeded == "1")
+Headachepreceeded <- subset(Headachesubset, preceeded == "1")
+Epilepsypreceeded <- subset(Epilepsysubset, preceeded == "1")
+TBIpreceeded <- subset(TBIsubset, preceeded == "1")
+Strokepreceeded <- subset(Strokesubset, preceeded == "1")
+
+#precededcount
+ADpreceededcount <- nrow(ADpreceeded)
+PDpreceededcount <- nrow(PDpreceeded)
+ALSpreceededcount <- nrow(ALSpreceeded)
+HDpreceededcount <- nrow(HDpreceeded)
+MSpreceededcount <- nrow(MSpreceeded)
+Migrainepreceededcount <- nrow(Migrainepreceeded)
+Headachepreceededcount <- nrow(Headachepreceeded)
+Epilepsypreceededcount <- nrow(Epilepsypreceeded)
+TBIpreceededcount <- nrow(TBIpreceeded)
+Strokepreceededcount <- nrow(Strokepreceeded)
+
+#precededpercent
+ADpcdpercent <- (divide_by(ADpreceededcount,ADcount))*100
+PDpcdpercent <- (divide_by(PDpreceededcount,PDcount))*100
+ALSpcdpercent <- (divide_by(ALSpreceededcount,ALScount))*100
+HDpcdpercent <- (divide_by(HDpreceededcount,HDcount))*100
+MSpcdpercent <- (divide_by(MSpreceededcount,MScount))*100
+Migrainepcdpercent <-(divide_by(Migrainepreceededcount,Migrainecount))*100
+Headachepcdpercent <- (divide_by(Headachepreceededcount,Headachecount))*100
+Epilepsypcdpercent <- (divide_by(Epilepsypreceededcount,Epilepsycount))*100
+TBIpcdpercent <- (divide_by(TBIpreceededcount,TBIcount))*100
+Strokepcdpercent <- (divide_by(Strokepreceededcount,Strokecount))*100
+#bypass is opposite percent
+
+#ambig
+ADpreceededambi <- subset(ADsubset, Ambigious == "1")
+PDpreceededambi<- subset(PDsubset, Ambigious == "1")
+ALSpreceededambi <- subset(ALSsubset, Ambigious == "1")
+HDpreceededambi <- subset(HDsubset, Ambigious == "1")
+MSpreceededambi <- subset(MSsubset, Ambigious == "1")
+Migrainepreceededambi <- subset(Migrainesubset, Ambigious == "1")
+Headachepreceededambi <- subset(Headachesubset, Ambigious == "1")
+Epilepsypreceededambi <- subset(Epilepsysubset, Ambigious == "1")
+TBIpreceededambi <- subset(TBIsubset, Ambigious == "1")
+Strokepreceededambi <- subset(Strokesubset, Ambigious == "1")
+
+#precededambicount
+ADpreceededcountambi <- nrow(ADpreceededambi)
+PDpreceededcountambi <- nrow(PDpreceededambi)
+ALSpreceededcountambi <- nrow(ALSpreceededambi)
+HDpreceededcountambi <- nrow(HDpreceededambi)
+MSpreceededcountambi <- nrow(MSpreceededambi)
+Migrainepreceededcountambi <- nrow(Migrainepreceededambi)
+Headachepreceededcountambi <- nrow(Headachepreceededambi)
+Epilepsypreceededcountambi <- nrow(Epilepsypreceededambi)
+TBIpreceededcountambi <- nrow(TBIpreceededambi)
+Strokepreceededcountambi <- nrow(Strokepreceededambi)
+
+#precededambipercent
+ADpcdpercentambi <- (divide_by(ADpreceededcountambi,ADcount))*100
+PDpcdpercentambi <- (divide_by(PDpreceededcountambi,PDcount))*100
+ALSpcdpercentambi <- (divide_by(ALSpreceededcountambi,ALScount))*100
+HDpcdpercentambi <- (divide_by(HDpreceededcountambi,HDcount))*100
+MSpcdpercentambi <- (divide_by(MSpreceededcountambi,MScount))*100
+Migrainepcdpercentambi <-(divide_by(Migrainepreceededcountambi,Migrainecount))*100
+Headachepcdpercentambi <- (divide_by(Headachepreceededcountambi,Headachecount))*100
+Epilepsypcdpercentambi <- (divide_by(Epilepsypreceededcountambi,Epilepsycount))*100
+TBIpcdpercentambi <- (divide_by(TBIpreceededcountambi,TBIcount))*100
+Strokepcdpercentambi <- (divide_by(Strokepreceededcountambi,Strokecount))*100
+
+#Bypasstruenumber 
+  
+ADtruebpnumber <- (ADcount-(ADpreceededcountambi+ADpreceededcount))
+PDtruebpnumber <- (PDcount-(PDpreceededcountambi+PDpreceededcount))
+ALStruebpnumber <- (ALScount-(ALSpreceededcountambi+ALSpreceededcount))
+HDtruebpnumber <- (HDcount-(HDpreceededcountambi+HDpreceededcount))
+MStruebpnumber <- (MScount-(MSpreceededcountambi+MSpreceededcount))
+Migrainetruebpnumber <- (Migrainecount-(Migrainepreceededcountambi+Migrainepreceededcount))
+Headachetruebpnumber <- (Headachecount-(Headachepreceededcountambi+Headachepreceededcount))
+Epilepsytruebpnumber <- (Epilepsycount-(Epilepsypreceededcountambi+Epilepsypreceededcount))
+TBItruebpnumber <- (TBIcount-(TBIpreceededcountambi+TBIpreceededcount))
+Stroketruebpnumber <- (Strokecount-(Strokepreceededcountambi+Strokepreceededcount))
+
+#Bypasstruepercent 
+
+ADtruebppercent <- 100-ADpcdpercentambi
+PDtruebppercent <- 100-PDpcdpercentambi
+ALStruebppercent <- 100-ALSpcdpercentambi
+HDtruebppercent <- 100-HDpcdpercentambi
+MStruebpdpercent <- 100-MSpcdpercentambi
+Migrainetruebppercent <- 100-Migrainepcdpercentambi
+Headachetruebppercent <- 100-Headachepcdpercentambi
+Epilepsytruebppercent <- 100-Epilepsypcdpercentambi
+TBItruebppercent <- 100-TBIpcdpercentambi
+Stroketruebppercent <- 100-Strokepcdpercentambi
+
+Indicationvector1<-c("All indications", "Alzheimer'ss disease","Parkinson's disease","Amyotrophic lateral sclerosis","Huntington's disease","Multiple sclerosis","Migraine","Headache","Epilepsy","TBI","Stroke")
+
+NumberofTrials<- c(Totalcount, ADcount, PDcount, ALScount, HDcount, MScount, Migrainecount, Headachecount, Epilepsycount, TBIcount, Strokecount)
+
+PreceededNumber<- c(Totalpreceededcount,ADpreceededcount,PDpreceededcount,ALSpreceededcount,HDpreceededcount,MSpreceededcount,Migrainepreceededcount,Headachepreceededcount,Epilepsypreceededcount,TBIpreceededcount, Strokepreceededcount)
+PreceededRate<- c(Totalpreceededpercent, ADpcdpercent, PDpcdpercent, ALSpcdpercent, HDpcdpercent, MSpcdpercent, Migrainepcdpercent, Headachepcdpercent, Epilepsypcdpercent,TBIpcdpercent, Strokepcdpercent)
+
+PreceededambiNumber <- c(Totalambigiouscount,ADpreceededcountambi,PDpreceededcountambi,ALSpreceededcountambi,HDpreceededcountambi,MSpreceededcountambi,Migrainepreceededcountambi,Headachepreceededcountambi,Epilepsypreceededcountambi,TBIpreceededcountambi,Strokepreceededcountambi)
+PreceededambiRate <- c(Totalambigiouspercent,ADpcdpercentambi,PDpcdpercentambi,ALSpcdpercentambi,HDpcdpercentambi,MSpcdpercentambi,Migrainepcdpercentambi,Headachepcdpercentambi,Epilepsypcdpercentambi,TBIpcdpercentambi,Strokepcdpercentambi)
+
+Bypasstruenumber <- c(Totalbypasscount,ADtruebpnumber, PDtruebpnumber, ALStruebpnumber, HDtruebpnumber, MStruebpnumber, Migrainetruebpnumber, Headachetruebpnumber, Epilepsytruebpnumber, TBItruebpnumber, Stroketruebpnumber)
+Bypasstruepercent <- c(Totalbypasspercent, ADtruebppercent, PDtruebppercent, ALStruebppercent, HDtruebppercent, MStruebpdpercent,Migrainetruebppercent, Headachetruebppercent, Epilepsytruebppercent, TBItruebppercent, Stroketruebppercent)
+
+prevelance <- data.frame(Indication=rep(Indicationvector1),
+                 Number_of_P3_Trials=rep(NumberofTrials),
+                 PreceededNumber=rep(PreceededNumber),
+                 PreceededRate=rep(PreceededRate),
+                 AmbigiousNumber=rep(PreceededambiNumber),
+                 AmbigiousRate=rep(PreceededambiRate),
+                 Bypasstruenumber=rep(Bypasstruenumber),
+                 Bypasstruepercent=rep(Bypasstruepercent)
+                 )
+
+#view head of data 
+print(prevelance)
+
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
+#for association table
+#overall
+
+OverallIndustrysubset <- subset(neurobypass, pharmafunding == "pharma")
+OverallApprovedsubset <- subset(neurobypass, approval == "1")
+OverallSymptomsubset<- subset(neurobypass, Symptom_focus == "Not_symptom_focus")
+OverallSeveritysubset<- subset(neurobypass, severity == "1")
+
+OverallIndustrynumber <- nrow(OverallIndustrysubset)
+OverallApprovednumber <- nrow(OverallApprovedsubset)
+OverallSymptomnumber<- nrow(OverallSymptomsubset)
+OverallSeveritynumber<- nrow(OverallSeveritysubset)
+
+OverallIndustrypercent <- (divide_by(OverallIndustrynumber,Totalcount))*100
+OverallApprovedpercent <- (divide_by(OverallApprovednumber,Totalcount))*100
+OverallSymptompercent<- (divide_by(OverallSymptomnumber,Totalcount))*100
+OverallSeveritypercent<- (divide_by(OverallSeveritynumber,Totalcount))*100
+#proceeded
+Procsubset<-subset(neurobypass,preceeded=="1")
+Procnumber<-nrow(Procsubset)
+
+ProcIndustrysubset <- subset(Procsubset, pharmafunding == "pharma")
+ProcApprovedsubset <- subset(Procsubset, approval == "1")
+ProcSymptomsubset<- subset(Procsubset, Symptom_focus == "Not_symptom_focus")
+ProcSeveritysubset<- subset(Procsubset, severity == "1")
+
+ProcIndustrynumber <- nrow(ProcIndustrysubset)
+ProcApprovednumber <- nrow(ProcApprovedsubset)
+ProcSymptomnumber<- nrow(ProcSymptomsubset)
+ProcSeveritynumber<- nrow(ProcSeveritysubset)
+
+ProcIndustrypercent <- (divide_by(ProcIndustrynumber,Procnumber))*100
+ProcApprovedpercent <- (divide_by(ProcApprovednumber,Procnumber))*100
+ProcSymptompercent<- (divide_by(ProcSymptomnumber,Procnumber))*100
+ProcSeveritypercent<- (divide_by(ProcSeveritynumber,Procnumber))*100
+
+BroadBypass <-subset(neurobypass,preceeded=="0")
+BroadBypassnumber <-nrow(BroadBypass)
+
+BroadBypassIndustrysubset <- subset(BroadBypass, pharmafunding == "pharma")
+BroadBypassApprovedsubset <- subset(BroadBypass, approval == "1")
+BroadBypassSymptomsubset<- subset(BroadBypass, Symptom_focus = "Not_symptom_focus")
+BroadBypassSeveritysubset<- subset(BroadBypass, severity == "1")
+
+BroadBypassIndustrynumber <- nrow(BroadBypassIndustrysubset)
+BroadBypassApprovednumber <- nrow(BroadBypassApprovedsubset)
+BroadBypassSymptomnumber<- nrow(BroadBypassSymptomsubset)
+BroadBypassSeveritynumber<- nrow(BroadBypassSeveritysubset)
+
+BroadBypassIndustrypercent <- (divide_by(BypassIndustrynumber,BroadBypassnumber))*100
+BroadBypassApprovedpercent <- (divide_by(BypassApprovednumber,BroadBypassnumber))*100
+BroadBypassSymptompercent<- (divide_by(BypassSymptomnumber,BroadBypassnumber))*100
+BroadBypassSeveritypercent<- (divide_by(BypassSeveritynumber,BroadBypassnumber))*100
+
+Names<-c("Pharma funded","Approved","Disease modifying intervention","Severe disease")
+
+Overallsecondaries<-c(OverallIndustrypercent,OverallApprovedpercent,OverallSymptompercent,OverallSeveritypercent)
+Proceededsecondaries<-c(ProcIndustrypercent,ProcApprovedpercent,ProcSymptompercent,ProcSeveritypercent)
+Broadbypasssecondaries<-c(BroadBypassIndustrypercent,BroadBypassApprovedpercent,BroadBypassSymptompercent,BroadBypassSeveritypercent)
+
+secondariestable <- data.frame(Secondary=rep(Names),
+                 All_Trials=rep(Overallsecondaries),
+                 Percent_of_Trials_Proceeded_by_P2_inthis_category=rep(Proceededsecondaries),
+                 Percent_of_Trials_that_Bypassed_P2_inthis_category=rep(Broadbypasssecondaries)
+                 )
+
+print(secondariestable)
+```
+ 
+
+```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
+neurobypass <- read_excel("cleanforcoding.xlsx")
+#for positivity
+
+#AllP2STATUS
+Overallpossubset <- subset(neurobypass, positivityofP3 == "Positive")
+ADpossubset <- subset(ADsubset, positivityofP3 == "Positive")
+PDpossubset <- subset(PDsubset, positivityofP3 == "Positive")
+ALSpossubset <- subset(ALSsubset, positivityofP3 == "Positive")
+HDpossubset <- subset(HDsubset, positivityofP3 == "Positive")
+MSpossubset <- subset(MSsubset, positivityofP3 == "Positive")
+Migrainepossubset <- subset(Migrainesubset, positivityofP3 == "Positive")
+Headachepossubset <- subset(Headachesubset, positivityofP3 == "Positive")
+Epilepsypossubset <- subset(Epilepsysubset, positivityofP3 == "Positive")
+TBIpossubset <- subset(TBIsubset, positivityofP3 == "Positive")
+Strokepossubset <- subset(Strokesubset, positivityofP3 == "Positive")
+
+#poscount
+Overallposcount <- nrow(Overallpossubset)
+ADposcount <- nrow(ADpossubset)
+PDposcount <- nrow(PDpossubset)
+ALSposcount <- nrow(ALSpossubset)
+HDposcount <- nrow(HDpossubset)
+MSposcount <- nrow(MSpossubset)
+Migraineposcount <- nrow(Migrainepossubset)
+Headacheposcount <- nrow(Headachepossubset)
+Epilepsyposcount <- nrow(Epilepsypossubset)
+TBIposcount <- nrow(TBIpossubset)
+Strokeposcount <- nrow(Strokepossubset)
+
+#pospercent
+Overallpospercent <- (divide_by(Overallposcount,Totalcount))*100
+ADpospercent <- (divide_by(ADposcount,ADcount))*100
+PDpospercent <- (divide_by(PDposcount,PDcount))*100
+ALSpospercent <- (divide_by(ALSposcount,ALScount))*100
+HDpospercent <- (divide_by(HDposcount,HDcount))*100
+MSpospercent <- (divide_by(MSposcount,MScount))*100
+Migrainepospercent <-(divide_by(Migraineposcount,Migrainecount))*100
+Headachepospercent <- (divide_by(Headacheposcount,Headachecount))*100
+Epilepsypospercent <- (divide_by(Epilepsyposcount,Epilepsycount))*100
+TBIpospercent <- (divide_by(TBIposcount,TBIcount))*100
+Strokepospercent <- (divide_by(Strokeposcount,Strokecount))*100
+
+#PROCEEDED
+#proceededpos
+Overallpreceed <- subset(neurobypass, preceeded == "1")
+ADpreceed <- subset(ADsubset, preceeded == "1")
+PDpreceed<- subset(PDsubset, preceeded == "1")
+ALSpreceed <- subset(ALSsubset, preceeded == "1")
+HDpreceed <- subset(HDsubset, preceeded == "1")
+MSpreceed <- subset(MSsubset, preceeded == "1")
+Migrainepreceed <- subset(Migrainesubset, preceeded == "1")
+Headachepreceed <- subset(Headachesubset, preceeded == "1")
+Epilepsypreceed <- subset(Epilepsysubset, preceeded == "1")
+TBIpreceed <- subset(TBIsubset, preceeded == "1")
+Strokepreceed <- subset(Strokesubset, preceeded == "1")
+
+Overallpreceedcount <- nrow(Overallpreceed)
+ADpreceedcount <- nrow(ADpreceed)
+PDpreceedcount <- nrow(PDpreceed)
+ALSpreceedcount <- nrow(ALSpreceed)
+HDpreceedcount <- nrow(HDpreceed)
+MSpreceedcount <- nrow(MSpreceed)
+Migrainepreceedcount <- nrow(Migrainepreceed)
+Headachepreceedcount <- nrow(Headachepreceed)
+Epilepsypreceedcount <- nrow(Epilepsypreceed)
+TBIpreceedcount <- nrow(TBIpreceed)
+Strokepreceedcount <- nrow(Strokepreceed)
+
+Overallprecedpos <- subset(Overallpreceed, positivityofP3 == "Positive")
+ADprecedpos <- subset(ADpreceed, positivityofP3 == "Positive")
+PDprecedpos<- subset(PDpreceed, positivityofP3 == "Positive")
+ALSprecedpos <- subset(ALSpreceed, positivityofP3 == "Positive")
+HDprecedpos <- subset(HDpreceed, positivityofP3 == "Positive")
+MSprecedpos <- subset(MSpreceed, positivityofP3 == "Positive")
+Migraineprecedpos <- subset(Migrainepreceed, positivityofP3 == "Positive")
+Headacheprecedpos <- subset(Headachepreceed, positivityofP3 == "Positive")
+Epilepsyprecedpos <- subset(Epilepsypreceed, positivityofP3 == "Positive")
+TBIprecedpos <- subset(TBIpreceed, positivityofP3 == "Positive")
+Strokeprecedpos <- subset(Strokepreceed, positivityofP3 == "Positive")
+
+Overallprecposnumber <-nrow(Overallprecedpos)
+ADprecposnumber <- nrow(ADprecedpos)
+PDprecposnumber <- nrow(PDprecedpos)
+ALSprecposnumber  <- nrow(ALSprecedpos)
+HDprecposnumber  <- nrow(HDprecedpos)
+MSprecposnumber  <- nrow(MSprecedpos)
+Migraineprecposnumber  <- nrow(Migraineprecedpos)
+Headacheprecposnumber  <- nrow(Headacheprecedpos)
+Epilepsyprecposnumber  <- nrow(Epilepsyprecedpos)
+TBIprecposnumber  <- nrow(TBIprecedpos)
+Strokeprecposnumber  <- nrow(Strokeprecedpos)
+
+Overallprecedpospercent <- (divide_by(Overallprecposnumber,Overallpreceedcount))*100
+ADprecedpospercent <- (divide_by(ADprecposnumber,ADpreceedcount))*100
+PDprecedpospercent <- (divide_by(PDprecposnumber,PDpreceedcount))*100
+ALSprecedpospercent  <- (divide_by(ALSprecposnumber,ALSpreceedcount))*100
+HDprecedpospercent <- (divide_by(HDprecposnumber,HDpreceedcount))*100
+MSprecedpospercent <- (divide_by(MSprecposnumber,MSpreceedcount))*100
+Migraineprecedpospercent <- (divide_by(Migraineprecposnumber,Migrainepreceedcount))*100
+Headacheprecedpospercent <- (divide_by(Headacheprecposnumber,Headachepreceedcount))*100
+Epilepsyprecedpospercent <- (divide_by(Epilepsyprecposnumber,Epilepsypreceedcount))*100
+TBIprecedpospercent <- (divide_by(TBIprecposnumber,TBIpreceedcount))*100
+Strokeprecedposnumber  <- (divide_by(Strokeprecposnumber,Strokepreceedcount))*100
+
+#BYPASS
+Overallbypassandambi <- subset(neurobypass, preceeded == "0")
+ADbypassandambi <- subset(ADsubset, preceeded == "0")
+PDbypassandambi<- subset(PDsubset, preceeded == "0")
+ALSbypassandambi <- subset(ALSsubset, preceeded == "0")
+HDbypassandambi <- subset(HDsubset, preceeded == "0")
+MSbypassandambi <- subset(MSsubset, preceeded == "0")
+Migrainebypassandambi <- subset(Migrainesubset, preceeded == "0")
+Headachebypassandambi <- subset(Headachesubset, preceeded == "0")
+Epilepsybypassandambi <- subset(Epilepsysubset, preceeded == "0")
+TBIbypassandambi <- subset(TBIsubset, preceeded == "0")
+Strokebypassandambi <- subset(Strokesubset, preceeded == "0")
+
+Overallbypassandambicount<- nrow(Overallbypassandambi)
+ADbypassandambicount <- nrow(ADbypassandambi)
+PDbypassandambicount <- nrow(PDbypassandambi)
+ALSbypassandambicount <- nrow(ALSbypassandambi)
+HDbypassandambicount <- nrow(HDbypassandambi)
+MSbypassandambicount <- nrow(MSbypassandambi)
+Migrainebypassandambicount <- nrow(Migrainebypassandambi)
+Headachebypassandambicount <- nrow(Headachebypassandambi)
+Epilepsybypassandambicount <- nrow(Epilepsybypassandambi)
+TBIbypassandambicount <- nrow(TBIbypassandambi)
+Strokebypassandambicount <- nrow(Strokebypassandambi)
+
+Overallbypasspos <- subset(Overallbypassandambi, positivityofP3 == "Positive")
+ADbypasspos <- subset(ADbypassandambi, positivityofP3 == "Positive")
+PDbypasspos<- subset(PDbypassandambi, positivityofP3 == "Positive")
+ALSbypasspos <- subset(ALSbypassandambi, positivityofP3 == "Positive")
+HDbypasspos <- subset(HDbypassandambi, positivityofP3 == "Positive")
+MSbypasspos <- subset(MSbypassandambi, positivityofP3 == "Positive")
+Migrainebypasspos <- subset(Migrainebypassandambi, positivityofP3 == "Positive")
+Headachebypasspos <- subset(Headachebypassandambi, positivityofP3 == "Positive")
+Epilepsybypasspos <- subset(Epilepsybypassandambi, positivityofP3 == "Positive")
+TBIbypasspos <- subset(TBIbypassandambi, positivityofP3 == "Positive")
+Strokebypasspos <- subset(Strokebypassandambi, positivityofP3 == "Positive")
+
+Overallbypassposnumber <- nrow(Overallbypasspos)
+ADbypassposnumber <- nrow(ADbypasspos)
+PDbypassposnumber <- nrow(PDbypasspos)
+ALSbypassposnumber  <- nrow(ALSbypasspos)
+HDbypassposnumber  <- nrow(HDbypasspos)
+MSbypassposnumber  <- nrow(MSbypasspos)
+Migrainebypassposnumber  <- nrow(Migrainebypasspos)
+Headachebypassposnumber  <- nrow(Headachebypasspos)
+Epilepsybypassposnumber  <- nrow(Epilepsybypasspos)
+TBIbypassposnumber  <- nrow(TBIbypasspos)
+Strokebypassposnumber  <- nrow(Strokebypasspos)
+
+Overallbypasspospercent <-(divide_by(Overallbypassposnumber,Overallbypassandambicount))*100
+ADbypasspospercent <- (divide_by(ADbypassposnumber,ADbypassandambicount))*100
+PDbypasspospercent <- (divide_by(PDbypassposnumber,PDbypassandambicount))*100
+ALSbypasspospercent  <- (divide_by(ALSbypassposnumber,ALSbypassandambicount))*100
+HDbypasspospercent <- (divide_by(HDbypassposnumber,HDbypassandambicount))*100
+MSbypasspospercent <- (divide_by(MSbypassposnumber,MSbypassandambicount))*100
+Migrainebypasspospercent <- (divide_by(Migrainebypassposnumber,Migrainebypassandambicount))*100
+Headachebypasspospercent <- (divide_by(Headachebypassposnumber,Headachebypassandambicount))*100
+Epilepsybypasspospercent <- (divide_by(Epilepsybypassposnumber,Epilepsybypassandambicount))*100
+TBIbypasspospercent <- (divide_by(TBIbypassposnumber,TBIbypassandambicount))*100
+Strokebypassposnumber  <- (divide_by(Strokebypassposnumber,Strokebypassandambicount))*100
+
+#TERMINATION
+#all indications term
+Overalltermsubset <- subset(neurobypass, terminationcode == "1")
+ADtermsubset <- subset(ADsubset, terminationcode == "1")
+PDtermsubset <- subset(PDsubset,terminationcode == "1")
+ALStermsubset <- subset(ALSsubset, terminationcode == "1")
+HDtermsubset <- subset(HDsubset, terminationcode == "1")
+MStermsubset <- subset(MSsubset, terminationcode == "1")
+Migrainetermsubset <- subset(Migrainesubset, terminationcode == "1")
+Headachetermsubset <- subset(Headachesubset, terminationcode == "1")
+Epilepsytermsubset <- subset(Epilepsysubset, terminationcode == "1")
+TBItermsubset <- subset(TBIsubset, terminationcode == "1")
+Stroketermsubset <- subset(Strokesubset, terminationcode == "1")
+
+#poscount
+Overalltermcount <- nrow(Overalltermsubset)
+ADtermcount <- nrow(ADtermsubset)
+PDtermcount <- nrow(PDtermsubset)
+ALStermcount <- nrow(ALStermsubset)
+HDtermcount <- nrow(HDtermsubset)
+MStermcount <- nrow(MStermsubset)
+Migrainetermcount <- nrow(Migrainetermsubset)
+Headachetermcount <- nrow(Headachetermsubset)
+Epilepsytermcount <- nrow(Epilepsytermsubset)
+TBItermcount <- nrow(TBItermsubset)
+Stroketermcount <- nrow(Stroketermsubset)
+
+#pospercent
+Overalltermpercent <- (divide_by(Overalltermcount,Totalcount))*100
+ADtermpercent <- (divide_by(ADtermcount,ADcount))*100
+PDtermpercent <- (divide_by(PDtermcount,PDcount))*100
+ALStermpercent <- (divide_by(ALStermcount,ALScount))*100
+HDtermpercent <- (divide_by(HDtermcount,HDcount))*100
+MStermpercent <- (divide_by(MStermcount,MScount))*100
+Migrainetermpercent <-(divide_by(Migrainetermcount,Migrainecount))*100
+Headachetermpercent <- (divide_by(Headachetermcount,Headachecount))*100
+Epilepsytermpercent <- (divide_by(Epilepsytermcount,Epilepsycount))*100
+TBItermpercent <- (divide_by(TBItermcount,TBIcount))*100
+Stroketermpercent <- (divide_by(Stroketermcount,Strokecount))*100
+
+#preceded term
+Overallpreceedterm <-subset(Overallpreceed, terminationcode == "1")
+ADprecedterm <- subset(ADpreceed, terminationcode == "1")
+PDprecedterm<- subset(PDpreceed, terminationcode == "1")
+ALSprecedterm <- subset(ALSpreceed, terminationcode == "1")
+HDprecedterm <- subset(HDpreceed, terminationcode == "1")
+MSprecedterm <- subset(MSpreceed, terminationcode == "1")
+Migraineprecedterm <- subset(Migrainepreceed, terminationcode == "1")
+Headacheprecedterm <- subset(Headachepreceed, terminationcode == "1")
+Epilepsyprecedterm <- subset(Epilepsypreceed, terminationcode == "1")
+TBIprecedterm <- subset(TBIpreceed, terminationcode == "1")
+Strokeprecedterm <- subset(Strokepreceed, terminationcode == "1")
+
+Overallprectermnumber <- nrow(Overallpreceedterm)
+ADprectermnumber <- nrow(ADprecedterm)
+PDprectermnumber <- nrow(PDprecedterm)
+ALSprectermnumber  <- nrow(ALSprecedterm)
+HDprectermnumber  <- nrow(HDprecedterm)
+MSprectermnumber  <- nrow(MSprecedterm)
+Migraineprectermnumber  <- nrow(Migraineprecedterm)
+Headacheprectermnumber  <- nrow(Headacheprecedterm)
+Epilepsyprectermnumber  <- nrow(Epilepsyprecedterm)
+TBIprectermnumber  <- nrow(TBIprecedterm)
+Strokeprectermnumber  <- nrow(Strokeprecedterm)
+
+Overallprecedtermpercent <- (divide_by(Overallprectermnumber,Overallpreceedcount))*100
+ADprecedtermpercent <- (divide_by(ADprectermnumber,ADpreceedcount))*100
+PDprecedtermpercent <- (divide_by(PDprectermnumber,PDpreceedcount))*100
+ALSprecedtermpercent  <- (divide_by(ALSprectermnumber,ALSpreceedcount))*100
+HDprecedtermpercent <- (divide_by(HDprectermnumber,HDpreceedcount))*100
+MSprecedtermpercent <- (divide_by(MSprectermnumber,MSpreceedcount))*100
+Migraineprecedtermpercent <- (divide_by(Migraineprectermnumber,Migrainepreceedcount))*100
+Headacheprecedtermpercent <- (divide_by(Headacheprectermnumber,Headachepreceedcount))*100
+Epilepsyprecedtermpercent <- (divide_by(Epilepsyprectermnumber,Epilepsypreceedcount))*100
+TBIprecedtermpercent <- (divide_by(TBIprectermnumber,TBIpreceedcount))*100
+Strokeprecedtermpercent  <- (divide_by(Strokeprectermnumber,Strokepreceedcount))*100
+
+#bypassterm
+Overallbypassterm<-subset(Overallbypassandambi, terminationcode == "1")
+ADbypassterm <- subset(ADbypassandambi, terminationcode == "1")
+PDbypassterm<- subset(PDbypassandambi, terminationcode == "1")
+ALSbypassterm <- subset(ALSbypassandambi, terminationcode == "1")
+HDbypassterm <- subset(HDbypassandambi, terminationcode == "1")
+MSbypassterm <- subset(MSbypassandambi, terminationcode == "1")
+Migrainebypassterm <- subset(Migrainebypassandambi, terminationcode == "1")
+Headachebypassterm <- subset(Headachebypassandambi, terminationcode == "1")
+Epilepsybypassterm <- subset(Epilepsybypassandambi, terminationcode == "1")
+TBIbypassterm <- subset(TBIbypassandambi, terminationcode == "1")
+Strokebypassterm <- subset(Strokebypassandambi, terminationcode == "1")
+
+Overallbypasstermnumber <- nrow(Overallbypassterm)
+ADbypasstermnumber <- nrow(ADbypassterm)
+PDbypasstermnumber <- nrow(PDbypassterm)
+ALSbypasstermnumber  <- nrow(ALSbypassterm)
+HDbypasstermnumber  <- nrow(HDbypassterm)
+MSbypasstermnumber  <- nrow(MSbypassterm)
+Migrainebypasstermnumber  <- nrow(Migrainebypassterm)
+Headachebypasstermnumber  <- nrow(Headachebypassterm)
+Epilepsybypasstermnumber  <- nrow(Epilepsybypassterm)
+TBIbypasstermnumber  <- nrow(TBIbypassterm)
+Strokebypasstermnumber  <- nrow(Strokebypassterm)
+
+Overallbypasstermpercent <- (divide_by(Overallbypasstermnumber,Overallbypassandambicount))*100
+ADbypasstermpercent <- (divide_by(ADbypasstermnumber,ADbypassandambicount))*100
+PDbypasstermpercent <- (divide_by(PDbypasstermnumber,PDbypassandambicount))*100
+ALSbypasstermpercent  <- (divide_by(ALSbypasstermnumber,ALSbypassandambicount))*100
+HDbypasstermpercent <- (divide_by(HDbypasstermnumber,HDbypassandambicount))*100
+MSbypasstermpercent <- (divide_by(MSbypasstermnumber,MSbypassandambicount))*100
+Migrainebypasstermpercent <- (divide_by(Migrainebypasstermnumber,Migrainebypassandambicount))*100
+Headachebypasstermpercent <- (divide_by(Headachebypasstermnumber,Headachebypassandambicount))*100
+Epilepsybypasstermpercent <- (divide_by(Epilepsybypasstermnumber,Epilepsybypassandambicount))*100
+TBIbypasstermpercent <- (divide_by(TBIbypasstermnumber,TBIbypassandambicount))*100
+Strokebypasstermnumber  <- (divide_by(Strokebypasstermnumber,Strokebypassandambicount))*100
+
+Indicationvector1<-c("All Indications","Alzheimer's disease","Parkinson's disease","Amyotrophic lateral sclerosis","Huntington's disease","Multiple sclerosis","Migraine","Headache","Epilepsy","TBI","Stroke")
+
+PositivityRate<- c(Overallpospercent,ADpospercent,PDpospercent,ALSpospercent,HDpospercent,MSpospercent,Migrainepospercent,Headachepospercent,Epilepsypospercent,TBIpospercent,Strokepospercent)
+
+proceedthatwerepospercent <- c(Overallprecedpospercent, ADprecedpospercent, PDprecedpospercent, ALSprecedpospercent, HDprecedpospercent, MSprecedpospercent,Migraineprecedpospercent,Headacheprecedpospercent,Epilepsyprecedpospercent,TBIprecedpospercent,Strokeprecedposnumber)
+
+bypassedthatwerepospercent<- c(Overallbypasspospercent,ADbypasspospercent,PDbypasspospercent, ALSbypasspospercent, HDbypasspospercent,MSbypasspospercent,Migrainebypasspospercent,Headachebypasspospercent,Epilepsybypasspospercent, TBIbypasspospercent, Strokebypassposnumber)
+
+TerminationRate<-c(Overalltermpercent,ADtermpercent,PDtermpercent,ALStermpercent,HDtermpercent,MStermpercent,Migrainetermpercent,Headachetermpercent,Epilepsytermpercent,TBItermpercent,Stroketermpercent)
+
+proceedthatweretermpercent <- c(Overallprecedtermpercent, ADprecedtermpercent,PDprecedtermpercent, ALSprecedtermpercent, HDprecedtermpercent, MSprecedtermpercent, Migraineprecedtermpercent, Headacheprecedtermpercent, Epilepsyprecedtermpercent, TBIprecedtermpercent, Strokeprecedtermpercent)
+
+bypassedthatweretermpercent<- c(Overallbypasstermpercent,ADbypasstermpercent,PDbypasstermpercent, ALSbypasstermpercent, HDbypasstermpercent,MSbypasstermpercent,Migrainebypasstermpercent,Headachebypasstermpercent,Epilepsybypasstermpercent, TBIbypasstermpercent, Strokebypasstermnumber)
+
+positivityandtermtable <- data.frame(Indication=rep(Indicationvector1),
+                 Positivity_Rate=rep(PositivityRate),
+                 Positivity_Rate_when_proceeded_by_P2=rep(proceedthatwerepospercent),
+                 Positivity_Rate_when_bypassed=rep(bypassedthatwerepospercent),
+                 Termination_Rate=rep(TerminationRate),
+                 Termination_Rate_when_proceeded=rep(proceedthatweretermpercent),
+                 Termination_Rate_when_bypassed=rep(bypassedthatweretermpercent)
+                 )
+
+print(positivityandtermtable)
+
+```
+
+
+```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
+#for SMD&for WdAe
+SMDpool <- SMDpool %>%
+  mutate(SMD_SE =   ((ABS(LOG(upperCI))-(LOG(lowerCI)))/(ABS(qnorm((1-0.95)/2))*2)))
+
+#seperate into indications-only these are included for now--check again when new data is added
+#Alzheimer’s disease, Parkinson’s disease, Migraine
+
+ADsubset <- subset(neurobypass, indication == "AD")
+PDsubset <- subset(neurobypass, indication == "PD")
+Migrainesubset <- subset(neurobypass, indication == "Migrane")
+
+ADSMDpool <- subset(ADsubset, Is_there_a_SMD == "1")
+PDSMDpool <- subset(PDsubset, Is_there_a_SMD == "1")
+MigraineSMDpool <- subset(Migrainesubset, Is_there_a_SMD == "1")
+
+      
+#do we log it?                                 
+ADSMDpooling <- metagen(
+  TE=log(Mean_difference),
+  seTE=SMD_SE,
+  data = ADSMDpool,
+  sm = "Mean difference",
+  comb.fixed = FALSE,
+  comb.random = TRUE,
+  subgroup = preceeded,
+  random = T,
+  fixed = F,
+  tau.common = F,
+  method.tau = "SJ", # # "DL", "PM", "REML", "ML", "HS", "SJ", "HE", or "EB"
+  adhoc.hakn = "se",
+)
+summary(ADSMDpooling)
+
+PDSMDpooling <- metagen(
+  TE=log(Mean_difference),
+  seTE=SMD_SE,
+  data = PDSMDpool,
+  sm = "Mean difference",
+  comb.fixed = FALSE,
+  comb.random = TRUE,
+  subgroup = preceeded,
+  random = T,
+  fixed = F,
+  tau.common = F,
+  method.tau = "SJ", # # "DL", "PM", "REML", "ML", "HS", "SJ", "HE", or "EB"
+  adhoc.hakn = "se",
+)
+summary(PDSMDpooling)
+
+MigraineSMDpooling <- metagen(
+  TE=log(Mean_difference),
+  seTE=SMD_SE,
+  data = MigraineSMDpool,
+  sm = "Mean difference",
+  comb.fixed = FALSE,
+  comb.random = TRUE,
+  subgroup = preceeded,
+  random = T,
+  fixed = F,
+  tau.common = F,
+  method.tau = "SJ", # # "DL", "PM", "REML", "ML", "HS", "SJ", "HE", or "EB"
+  adhoc.hakn = "se",
+)
+summary(MigraineSMDpooling)
+
+#wdAE
+ADwdAE<- subset(ADsubset, Is_there_a_WdueAE == "1")
+PDwdAE<- subset(PDsubset, Is_there_a_WdueAE == "1")
+MigrainewdAE<- subset(Migrainesubset, Is_there_a_WdueAE == "1")
+
+ADwdAEpooling <- metabin(
+  event.e=withdrawals_in_exparm,
+  n.e=Nexp_arm,
+  event.c=withdrawals_in_contarm,
+  n.c=Ncont_arm,
+  studlab = nct_id,
+  data = ADwdAE, 
+  subgroup = preceeded,
+  comb.fixed = FALSE,
+  fixed = F,
+  random = T,
+  method.tau = "PM", 
+  adhoc.hakn = "se",
+)
+summary (ADwdAEpooling)
+
+PDwdAEpooling <- metabin(
+  event.e=withdrawals_in_exparm,
+  n.e=Nexp_arm,
+  event.c=withdrawals_in_contarm,
+  n.c=Ncont_arm,
+  studlab = nct_id,
+  data = PDwdAE, 
+  subgroup = preceeded,
+  comb.fixed = FALSE,
+  fixed = F,
+  random = T,
+  method.tau = "PM", 
+  adhoc.hakn = "se",
+)
+summary (PDwdAEpooling)
+
+MigrainewdAEpooling <- metabin(
+  event.e=withdrawals_in_exparm,
+  n.e=Nexp_arm,
+  event.c=withdrawals_in_contarm,
+  n.c=Ncont_arm,
+  studlab = nct_id,
+  data = MigrainewdAE, 
+  subgroup = preceeded,
+  comb.fixed = FALSE,
+  fixed = F,
+  random = T,
+  method.tau = "PM", 
+  adhoc.hakn = "se",
+)
+summary (MigrainewdAEpooling)
+
+#forestplots
+
+labels1 <- c("Proceeded", "Bypass")
+smdnb <- metabind(ADSMDpooling,PDSMDpooling, MigraineSMDpooling, name = labels1)
+saenb <- metabind(ADwdAEpooling,PDwdAEpooling, MigrainewdAEpooling, name = labels1)
+
+pdf("PFSall.pdf",10,8)
+forest(smdnb, xlim=c(0.55,1.5), print.subgroup.labels = T,label.left = "<-------------
+Favours exp arm",label.right = "--------->
+control arm")
+dev.off()
+
+pdf("SAEall.pdf",10,8)
+forest(saenb, xlim=c(0.75,1.5), print.subgroup.labels = T,label.left = "<---------
+Favours exp arm",
+       label.right = "------------>
+Favours control arm")
+dev.off()
+```
+#write text 
+#write variables 
+Results Section 
+
+Sample
+After applying our inclusion criteria to the downloaded trials, **`r round(Totalcount, 2)`** trials were included in our analysis. Of these trials, **`r round(ADcount, 2)`** trials were in Alzheimer's disease", **`r round(PDcount, 2)`** Parkinson disease,**`r round(ALScount, 2)`** Amyotrophic lateral sclerosis, **`r round(HDcount, 2)`** Huntingtons disease,**`r round(MScount, 2)`** Multiple sclerosis ,**`r round(Migrainecount, 2)`** Migraine,**`r round(Headachecount, 2)`** Headache,**`r round(Epilepsycount, 2)`** Epilepsy,**`r round(TBIcount, 2)`** TBI ,**`r round(Strokecount, 2)`** Stroke. The average sample size was x and x (TABLE 1). 
+
+Prevalence
+In our sample, we found that **`r round(Totalpreceededcount, 2)`** were proceeded by a positive P2 trial ,**`r round(Totalambigiouscount, 2)`** were preceded by ambigious evidence, and **`r round(Totalbypasscount, 2)`** lacked any prior evidence that fulfilled our criteria. Overall positivity numbers? Prevalence of bypassing and P3 positivity is broken down into disease areas in Table 1.  Compare indications 
+
+Efficacy and SAEs:
+
+
