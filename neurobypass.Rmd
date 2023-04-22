@@ -1001,21 +1001,20 @@ write.table(pvalues)
 #patientnumbers and timing
 library(tidyverse)
 
-#nctids <- read_csv("~/Projects/Neurobypass/2023-01-25-hannah-ncts.csv") %>%
-    #select(nctid),
+nctids <- read_csv("nctsforenrollment.csv") %>%
+    select(nct_id)
 
-#nctids_string <- pull(nctids) %>%
-    #paste(collapse="%20OR%20"),
+nctids_string <- pull(nctids) %>%
+    paste(collapse="%20OR%20")
 
-#trials <- read_csv(paste0("https://clinicaltrials.gov/ct2/results/download_fields?down_count=10000&down_flds=all&down_fmt=csv&term=", nctids_string, "&flds=a&flds=b&flds=g&flds=o&flds=u")),
+trials <- read_csv(paste0("https://clinicaltrials.gov/ct2/results/download_fields?down_count=10000&down_flds=all&down_fmt=csv&term=", nctids_string, "&flds=a&flds=b&flds=g&flds=o&flds=u"))
 
-#trials <- trials %>%
-    #mutate(found = `NCT Number` %in% nctids$nctid) %>%
-   # filter(found) %>%
-   # select(! found),
-
-#trials %>%
-    #write_csv("~/Projects/Neurobypass/2023-01-25-hannah-trial-data.csv"),
+trials <- trials %>%
+    mutate(found = `NCT Number` %in% nctids$nct_id) %>%
+    filter(found) %>%
+    select(! found)
+trials %>%
+    write_csv("~/Projects/Neurobypass/2023-01-25-hannah-trial-data.csv")
 
 summary(neurobypass$Enrollment)
 summary(neurobypass$time_difference) 
