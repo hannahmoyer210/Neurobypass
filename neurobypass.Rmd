@@ -996,6 +996,107 @@ pvalues <- data.frame(Indication=rep(Indicationvector2),
 write.table(pvalues)
       
 ```
+```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
+#positivity when looking at diff definition of bypassing 
+#for positivity
+#PROCEEDED
+#proceededpos
+Overallpreceednew <- subset(Overallhasresults, Truebypass == "0")
+Overallpreceedcountnew <- nrow(Overallpreceednew)
+
+Overallprecedposnew <- subset(Overallpreceednew, positivityofP3 == "Positive")
+Overallprecposnumbernew <-nrow(Overallprecedposnew)
+Overallprecedpospercentnew <- (divide_by(Overallprecposnumbernew,Overallpreceedcountnew))*100
+
+#BYPASS
+Overallbypass <- subset(Overallhasresults, Truebypass == "1")
+Overallbypasscount<- nrow(Overallbypass)
+
+
+Overallbypassposnew <- subset(Overallbypass, positivityofP3 == "Positive")
+Overallbypassposnumbernew <- nrow(Overallbypassposnew)
+Overallbypasspospercentnew <-(divide_by(Overallbypassposnumbernew,Overallbypasscount))*100
+
+
+#TERMINATION
+
+#termpercent
+##need to use full sample make full sample denominators
+#preceded term
+Overallpreceedfullnew <- subset(neurobypass, Truebypass == "0")
+Overallpreceedfullcountnew <- nrow(Overallpreceedfullnew)
+
+#bypassfull sample
+Overallbypassfull <- subset(neurobypass, Truebypass == "1")
+Overallbypasscountfullnew <- nrow(Overallbypassfull)
+
+#preceded analysis 
+Overallpreceedtermnew <-subset(Overallpreceedfullnew, terminationcode == "1")
+Overallprectermnumbernew <- nrow(Overallpreceedtermnew)
+Overallprecedtermpercentnew <- (divide_by(Overallprectermnumbernew,Overallpreceedfullcountnew))*100
+
+#bypassterm
+Overallbypasstermnew<-subset(Overallbypassfull, terminationcode == "1")
+Overallbypasstermnumbernew <- nrow(Overallbypasstermnew)
+Overallbypasstermpercentnew <- (divide_by(Overallbypasstermnumbernew,Overallbypasscountfull))*100
+
+
+
+Indicationvector3<-c("Pos Clinical P2 ","Any P2")
+
+PositivityNnew<- c(Overallposcount,Overallposcount)
+
+PositivityRatenew<- c(Overallpospercent, Overallpospercent)
+
+proceedposNnew <- c(Overallprecposnumber, Overallprecposnumbernew)
+
+proceedthatwerepospercentnew <- c(Overallprecedpospercent, Overallprecedpospercentnew)
+
+bypassedposNnew<- c(Overallbypassposnumber,Overallbypassposnumbernew)
+
+bypassedthatwerepospercentnew<- c(Overallbypasspospercent,Overallbypasspospercentnew) 
+bypassedthatweretermpercentnew
+TerminationNnew<- c(Overalltermcount, Overalltermcount)
+
+TerminationRatenew<-c(Overalltermpercent,Overalltermpercent) 
+
+proceedtermNnew <- c(Overallprectermnumber, Overallprectermnumbernew)
+
+proceedthatweretermpercentnew <- c(Overallprecedtermpercent, Overallprecedtermpercentnew) 
+
+bypassedtermNnew<- c(Overallbypasstermnumber,Overallbypasstermnumbernew)
+
+bypassedthatweretermpercentnew<- c(Overallbypasstermpercent,Overallbypasstermpercentnew)
+
+Overalltermfisher2 <- prop.test((x = c(Overallprectermnumbernew,Overallbypasstermnumbernew)), (n = c(Overallpreceedfullcountnew,Overallbypasscountfullnew)), p = NULL, alternative ="two.sided",correct = TRUE)
+Overallposfisher2 <- prop.test((x = c(Overallprecposnumbernew,Overallbypassposnumbernew)), (n = c(Overallpreceedcountnew,Overallbypasscountfullnew)), p = NULL, alternative ="two.sided",correct = TRUE)
+Overalltermpvalue2 <- Overalltermfisher2$p.value
+Overallpospvalue2 <- Overallposfisher2$p.value
+
+pvaluespos<-c(Overallpospvalue,Overallpospvalue2)
+pvaluesterm<-c(Overalltermpvalue,Overalltermpvalue2)
+
+positivityandtermboth <- data.frame(Indication=rep(Indicationvector3),
+                 Positivity_N=rep(PositivityNnew),                 
+                 Positivity_Rate=rep(PositivityRatenew),
+                 PrecPositivity_N =rep(proceedposNnew),
+                 Positivity_Rate_when_proceeded_by_P2=rep(proceedthatwerepospercentnew),
+                 BypassPositivity_N =rep(bypassedposNnew),
+                 Positivity_Rate_when_bypassed=rep(bypassedthatwerepospercentnew),
+                 Pvalues_forpos=rep(pvaluespos),
+                 Termination_N=rep(TerminationNnew), 
+                 Termination_Rate=rep(TerminationRatenew),
+                 PrecTermination_N=rep(proceedtermNnew),
+                 Termination_Rate_when_proceeded=rep(proceedthatweretermpercentnew),
+                 BypassTermination_N=rep(bypassedtermNnew),
+                 Termination_Rate_when_bypassed=rep(bypassedthatweretermpercentnew),
+                 Pvalues_forterm=rep(pvaluesterm))
+
+
+write.table(positivityandtermboth)
+
+
+```
 
 ```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
 #patientnumbers and timing
