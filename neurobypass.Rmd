@@ -24,7 +24,10 @@ library(rstatix)
 
 ```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
 #for prevalance table 
-neurobypass <- read_csv("cleancodeR1.csv")
+neurobypass <- read_csv("cleancodeR2.csv")
+forrange<-neurobypass$enrollment 
+summary(neurobypass$enrollment)
+IQR(forrange) 
 
 #total overall
 Totalcount <-nrow(neurobypass)
@@ -272,44 +275,70 @@ Procnumber<-nrow(Procsubset)
 ProcIndustrysubset <- subset(Procsubset, pharmafunding == "pharma")
 ProcApprovedsubset <- subset(Procsubset, approva_status == "postapproval")
 
-
 ProcIndustrynumber <- nrow(ProcIndustrysubset)
 ProcApprovednumber <- nrow(ProcApprovedsubset)
-
 
 ProcIndustrypercent <- (divide_by(ProcIndustrynumber,Procnumber))*100
 ProcApprovedpercent <- (divide_by(ProcApprovednumber,Procnumber))*100
 
+#NP 
+NPBypass <-subset(neurobypass,Nonpositive =="1")
+NPBypassnumber <-nrow(NPBypass)
 
-BroadBypass <-subset(neurobypass,preceeded =="0")
-BroadBypassnumber <-nrow(BroadBypass)
+NPBypassIndustrysubset <- subset(NPBypass, pharmafunding == "pharma")
+NPBypassApprovedsubset <- subset(NPBypass, approva_status == "postapproval")
 
-BroadBypassIndustrysubset <- subset(BroadBypass, pharmafunding == "pharma")
-BroadBypassApprovedsubset <- subset(BroadBypass, approva_status == "postapproval")
+NPBypassIndustrynumber <- nrow(NPBypassIndustrysubset)
+NPBypassApprovednumber <- nrow(NPBypassApprovedsubset)
 
-BroadBypassIndustrynumber <- nrow(BroadBypassIndustrysubset)
-BroadBypassApprovednumber <- nrow(BroadBypassApprovedsubset)
+NPBypassIndustrypercent <- (divide_by(NPBypassIndustrynumber,NPBypassnumber))*100
+NPBypassApprovedpercent <- (divide_by(NPBypassApprovednumber,NPBypassnumber))*100
 
-BroadBypassIndustrypercent <- (divide_by(BroadBypassIndustrynumber,BroadBypassnumber))*100
-BroadBypassApprovedpercent <- (divide_by(BroadBypassApprovednumber,BroadBypassnumber))*100
+#BE
+BEBypass <-subset(neurobypass,bad_endpoint =="1")
+BEBypassnumber <-nrow(BEBypass)
 
-industryfisher <- prop.test((x = c(ProcIndustrynumber,BroadBypassIndustrynumber)), (n = c(Procnumber,BroadBypassnumber)), p = NULL, alternative ="two.sided",correct = TRUE)
+BEIndustrysubset <- subset(BEBypass, pharmafunding == "pharma")
+BEApprovedsubset <- subset(BEBypass, approva_status == "postapproval")
 
-approvedfisher <-  prop.test((x = c(ProcApprovednumber,BroadBypassApprovednumber)), (n = c(Procnumber,BroadBypassnumber)), p = NULL, alternative ="two.sided",correct = TRUE)
+BEIndustrynumber <- nrow(BEIndustrysubset)
+BEApprovednumber <- nrow(BEApprovedsubset)
 
-Overalltermpvalue <- Overalltermfisher$p.value
-ADtermpvalue <- ADtermfisher$p.value
+BEIndustrypercent <- (divide_by(BEIndustrynumber,BEBypassnumber))*100
+BEApprovedpercent <- (divide_by(BEApprovednumber,BEBypassnumber))*100
 
-industrypvalue <- Overalltermfisher$p.value
-approvalpvalue <- ADtermfisher$p.value
+#TB
+TrueBypass <-subset(neurobypass,Truebypass =="1")
+TrueBypassnumber <-nrow(TrueBypass)
+
+TrueBypassIndustrysubset <- subset(TrueBypass, pharmafunding == "pharma")
+TrueBypassApprovedsubset <- subset(TrueBypass, approva_status == "postapproval")
+
+TrueBypassIndustrynumber <- nrow(TrueBypassIndustrysubset)
+TrueBypassApprovednumber <- nrow(TrueBypassApprovedsubset)
+
+TrueBypassIndustrypercent <- (divide_by(TrueBypassIndustrynumber,TrueBypassnumber))*100
+TrueBypassApprovedpercent <- (divide_by(TrueBypassApprovednumber,TrueBypassnumber))*100
+
+#fisher
+
+industryfisher <- fisher.test(table(neurobypass$pharmafunding, neurobypass$preceeded))
+approvedfisher <- fisher.test(table(neurobypass$approva_status, neurobypass$preceeded))
+
+industrypvalue <- industryfisher$p.value
+approvalpvalue <- approvedfisher$p.value
 
 Names<-c("Pharma funded","Approved")
 OverallNs<-c(OverallIndustrynumber,OverallApprovednumber)
 Overallsecondaries<-c(OverallIndustrypercent,OverallApprovedpercent)
 Proceededsecondaries<-c(ProcIndustrynumber,ProcApprovednumber)
 Proceededsecondariespercent<-c(ProcIndustrypercent,ProcApprovedpercent)
-Broadbypasssecondaries<-c(BroadBypassIndustrynumber,BroadBypassApprovednumber)
-Broadbypasssecondariespercent<-c(BroadBypassIndustrypercent,BroadBypassApprovedpercent)
+NPbypasssecondaries<-c(NPBypassIndustrynumber,NPBypassApprovednumber)
+NPbypasssecondariespercent<-c(NPBypassIndustrypercent,NPBypassApprovedpercent)
+BEbypasssecondaries<-c(BEIndustrynumber,BEApprovednumber)
+BEbypasssecondariespercent<-c(BEIndustrypercent,BEApprovedpercent)
+Truebypasssecondaries<-c(TrueBypassIndustrynumber,TrueBypassApprovednumber)
+Truebypasssecondariespercent<-c(TrueBypassIndustrypercent,TrueBypassApprovedpercent)
 Pvaluessecondaries<-c(industrypvalue,approvalpvalue)
 
 secondariestable <- data.frame(Secondary=rep(Names),
@@ -317,8 +346,12 @@ secondariestable <- data.frame(Secondary=rep(Names),
                 All_percent=rep(Overallsecondaries),
                 PrecededN=rep(Proceededsecondaries),
                 Precededpercent=rep(Proceededsecondariespercent),
-                BypassN=rep(Broadbypasssecondaries),
-                Bypasspercent=rep(Broadbypasssecondariespercent),
+                NPBypassN=rep(NPbypasssecondaries),
+                NPBypasspercent=rep(NPbypasssecondariespercent),
+                BEBypassN=rep(BEbypasssecondaries),
+                BEBypasspercent=rep(BEbypasssecondariespercent),
+                TrueBypassN=rep(Truebypasssecondaries),
+                TrueBypasspercent=rep(Truebypasssecondariespercent),
                 pvalues=rep(Pvaluessecondaries)
                  )
 
@@ -756,28 +789,12 @@ SMDsubset$preceeded <- factor(SMDsubset$preceeded,
                                                   "Did not bypass"))
 SMDsubset <- SMDsubset %>%
   mutate(SMD_SE = case_when((variance_type=="95" ~ (abs((upperCI)-(lowerCI)))/(abs(qnorm((1-0.95)/2))*2)),
-                  (variance_type=="97" ~ (abs((upperCI)-(lowerCI)))/(abs(qnorm((1-0.97)/2))*2)),
-                  (variance_type=="0" ~  abs((Mean_difference)/qnorm(p_value/2)))))
+                  (variance_type=="not95" ~  abs((Mean_difference)/qnorm(p_value/2)))))
 
 ADsubsetSMD <- subset(SMDsubset, indication == "AD")
  
 
 ADSMDpooling <- metagen(
-  TE=Mean_difference,
-  seTE=SMD_SE,
-  data = ADsubsetSMD,
-  sm = "SMD",
-  comb.fixed = FALSE,
-  comb.random = TRUE,
-  subgroup = preceeded,
-  random = T,
-  fixed = F,
-  tau.common = F,
-  method.tau = "SJ", # # "DL", "PM", "REML", "ML", "HS", "SJ", "HE", or "EB"
-)
-summary(ADSMDpooling)
-
-PDSMDpooling <- metagen(
   TE=Mean_difference,
   seTE=SMD_SE,
   data = ADsubsetSMD,
@@ -890,13 +907,12 @@ HeadachewdAEpooling <- metabin(
 summary (HeadachewdAEpooling)
 
 #forestplots
-
 labels1 <- c("Preceded", "Bypass")
-labels2 <- c("PD","AD")
-labels3 <- c("All Indications","AD", "PD","ALS", "Headache")
+labels2 <- c("PD", "Alzheimer's disease")
+labels3 <- c("All Indications1","All Indications")
 
-smdnb <- metabind(ADSMDpooling,PDSMDpooling, name = labels2)
-waenb <- metabind(TotalwdAE,ADwdAEpooling,PDwdAEpooling, ALSwdAEpooling, HeadachewdAEpooling, name = labels3)
+smdnb <- metabind(ADSMDpooling,ADSMDpooling, name = labels2)
+waenb <- metabind(TotalwdAE, TotalwdAE, name = labels3)
 
 pdf("SMD.pdf",10,8)
 forest(smdnb, xlim=c(-1,.5), print.subgroup.labels = T,label.left =              "<-------------
@@ -914,86 +930,86 @@ dev.off()
 
 
 ```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
-#Fishertests
-#stroke has no preceded so it cant be included
-###TERMINATION PVALUES
-
-Overalltermfisher <- prop.test((x = c(Overallprectermnumber,Overallbypasstermnumber)), (n = c(Overallpreceedfullcount,Overallbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-ADtermfisher <-  prop.test((x = c(ADprectermnumber,ADbypasstermnumber)), (n = c(ADpreceedfullcount,ADbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-PDtermfisher <-  prop.test((x = c(PDprectermnumber,PDbypasstermnumber)), (n = c(PDpreceedfullcount,PDbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-ALStermfisher <-  prop.test((x = c(ALSprectermnumber,ALSbypasstermnumber)), (n = c(ALSpreceedfullcount,ALSbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-HDtermfisher <- prop.test((x = c(HDprectermnumber,HDbypasstermnumber)), (n = c(HDpreceedfullcount,HDbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-RMStermfisher <- prop.test((x = c(RMSprectermnumber,RMSbypasstermnumber)), (n = c(RMSpreceedfullcount,RMSbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-PMStermfisher<-  prop.test((x = c(PMSprectermnumber,PMSbypasstermnumber)), (n = c(PMSpreceedfullcount,PMSbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-Headachetermfisher<- prop.test((x = c(Headacheprectermnumber,Headachebypasstermnumber)), (n = c(Headachepreceedfullcount,Headachebypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-Epilepsytermfisher <-  prop.test((x = c(Epilepsyprectermnumber,Epilepsybypasstermnumber)), (n = c(Epilepsypreceedfullcount,Epilepsybypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-TBItermfisher <-  prop.test((x = c(TBIprectermnumber,TBIbypasstermnumber)), (n = c(TBIpreceedfullcount,TBIbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-
-###POSITIVITY PVALUES
-Overallposfisher <- prop.test((x = c(Overallprecposnumber,Overallbypassposnumber)), (n = c(Overallpreceedcount,Overallbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-ADposfisher <-  prop.test((x = c(ADprecposnumber,ADbypassposnumber)), (n = c(ADpreceedcount,ADbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-PDposfisher <-  prop.test((x = c(PDprecposnumber,PDbypassposnumber)), (n = c(PDpreceedcount,PDbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-ALSposfisher <-  prop.test((x = c(ALSprecposnumber,ALSbypassposnumber)), (n = c(ALSpreceedcount,ALSbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-HDposfisher <-  prop.test((x = c(HDprecposnumber,HDbypassposnumber)), (n = c(HDpreceedcount,HDbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-RMSposfisher <- prop.test((x = c(RMSprecposnumber,RMSbypassposnumber)), (n = c(RMSpreceedcount,RMSbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-PMSposfisher<-  prop.test((x = c(PMSprecposnumber,PMSbypassposnumber)), (n = c(PMSpreceedcount,PMSbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-Headacheposfisher<- prop.test((x = c(Headacheprecposnumber,Headachebypassposnumber)), (n = c(Headachepreceedcount,Headachebypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-Epilepsyposfisher <-  prop.test((x = c(Epilepsyprecposnumber,Epilepsybypassposnumber)), (n = c(Epilepsypreceedcount,Epilepsybypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-TBIposfisher <-  prop.test((x = c(TBIprecposnumber,TBIbypassposnumber)), (n = c(TBIpreceedcount,TBIbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
-
-
-Overalltermpvalue <- Overalltermfisher$p.value
-ADtermpvalue <- ADtermfisher$p.value
-PDtermpvalue <- PDtermfisher$p.value
-ALStermpvalue <- ALStermfisher$p.value
-HDtermpvalue <- HDtermfisher$p.value
-RMStermpvalue <- RMStermfisher$p.value
-PMStermpvalue<- PMStermfisher$p.value
-Headachetermpvalue<- Headachetermfisher$p.value
-Epilepsytermpvalue <- Epilepsytermfisher$p.value
-TBItermpvalue <- TBItermfisher$p.value
-
-
-Overallpospvalue <- Overallposfisher$p.value
-ADpospvalue <- ADposfisher$p.value
-PDpospvalue <- PDposfisher$p.value
-ALSpospvalue <- ALSposfisher$p.value
-HDpospvalue <- HDposfisher$p.value
-RMSpospvalue <- RMSposfisher$p.value
-PMSpospvalue<- PMSposfisher$p.value
-Headachepospvalue<- Headacheposfisher$p.value
-Epilepsypospvalue <- Epilepsyposfisher$p.value
-TBIpospvalue <- TBIposfisher$p.value
-
-Indicationvector2<-c("All Indications","Alzheimer's disease","Parkinson's disease","Amyotrophic lateral sclerosis","Huntington's disease","Relapsing Multiple sclerosis","Progressive multiple sclerosis","Headache","Epilepsy","TBI")
-
-pospvalues<- c(Overallpospvalue, ADpospvalue, PDpospvalue, ALSpospvalue, HDpospvalue, RMSpospvalue, PMSpospvalue, Headachepospvalue, Epilepsypospvalue, TBIpospvalue)
-
-termpvalues <- c(Overalltermpvalue, ADtermpvalue, PDtermpvalue, ALStermpvalue, HDtermpvalue, RMStermpvalue, PMStermpvalue, Headachetermpvalue, Epilepsytermpvalue, TBItermpvalue)
- 
-pvalues <- data.frame(Indication=rep(Indicationvector2),
-                 Positivity_pvalues=rep(pospvalues),                 
-                 Termination_pvalues=rep(termpvalues))
-write.table(pvalues)
+# #Fishertests
+# #stroke has no preceded so it cant be included
+# ###TERMINATION PVALUES
+# 
+# Overalltermfisher <- prop.test((x = c(Overallprectermnumber,Overallbypasstermnumber)), (n = c(Overallpreceedfullcount,Overallbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# ADtermfisher <-  prop.test((x = c(ADprectermnumber,ADbypasstermnumber)), (n = c(ADpreceedfullcount,ADbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# PDtermfisher <-  prop.test((x = c(PDprectermnumber,PDbypasstermnumber)), (n = c(PDpreceedfullcount,PDbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# ALStermfisher <-  prop.test((x = c(ALSprectermnumber,ALSbypasstermnumber)), (n = c(ALSpreceedfullcount,ALSbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# HDtermfisher <- prop.test((x = c(HDprectermnumber,HDbypasstermnumber)), (n = c(HDpreceedfullcount,HDbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# RMStermfisher <- prop.test((x = c(RMSprectermnumber,RMSbypasstermnumber)), (n = c(RMSpreceedfullcount,RMSbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# PMStermfisher<-  prop.test((x = c(PMSprectermnumber,PMSbypasstermnumber)), (n = c(PMSpreceedfullcount,PMSbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# Headachetermfisher<- prop.test((x = c(Headacheprectermnumber,Headachebypasstermnumber)), (n = c(Headachepreceedfullcount,Headachebypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# Epilepsytermfisher <-  prop.test((x = c(Epilepsyprectermnumber,Epilepsybypasstermnumber)), (n = c(Epilepsypreceedfullcount,Epilepsybypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# TBItermfisher <-  prop.test((x = c(TBIprectermnumber,TBIbypasstermnumber)), (n = c(TBIpreceedfullcount,TBIbypassandambicountfull)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# 
+# ###POSITIVITY PVALUES
+# Overallposfisher <- prop.test((x = c(Overallprecposnumber,Overallbypassposnumber)), (n = c(Overallpreceedcount,Overallbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# ADposfisher <-  prop.test((x = c(ADprecposnumber,ADbypassposnumber)), (n = c(ADpreceedcount,ADbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# PDposfisher <-  prop.test((x = c(PDprecposnumber,PDbypassposnumber)), (n = c(PDpreceedcount,PDbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# ALSposfisher <-  prop.test((x = c(ALSprecposnumber,ALSbypassposnumber)), (n = c(ALSpreceedcount,ALSbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# HDposfisher <-  prop.test((x = c(HDprecposnumber,HDbypassposnumber)), (n = c(HDpreceedcount,HDbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# RMSposfisher <- prop.test((x = c(RMSprecposnumber,RMSbypassposnumber)), (n = c(RMSpreceedcount,RMSbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# PMSposfisher<-  prop.test((x = c(PMSprecposnumber,PMSbypassposnumber)), (n = c(PMSpreceedcount,PMSbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# Headacheposfisher<- prop.test((x = c(Headacheprecposnumber,Headachebypassposnumber)), (n = c(Headachepreceedcount,Headachebypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# Epilepsyposfisher <-  prop.test((x = c(Epilepsyprecposnumber,Epilepsybypassposnumber)), (n = c(Epilepsypreceedcount,Epilepsybypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# TBIposfisher <-  prop.test((x = c(TBIprecposnumber,TBIbypassposnumber)), (n = c(TBIpreceedcount,TBIbypassandambicount)), p = NULL, alternative ="two.sided",correct = TRUE)
+# 
+# 
+# Overalltermpvalue <- Overalltermfisher$p.value
+# ADtermpvalue <- ADtermfisher$p.value
+# PDtermpvalue <- PDtermfisher$p.value
+# ALStermpvalue <- ALStermfisher$p.value
+# HDtermpvalue <- HDtermfisher$p.value
+# RMStermpvalue <- RMStermfisher$p.value
+# PMStermpvalue<- PMStermfisher$p.value
+# Headachetermpvalue<- Headachetermfisher$p.value
+# Epilepsytermpvalue <- Epilepsytermfisher$p.value
+# TBItermpvalue <- TBItermfisher$p.value
+# 
+# 
+# Overallpospvalue <- Overallposfisher$p.value
+# ADpospvalue <- ADposfisher$p.value
+# PDpospvalue <- PDposfisher$p.value
+# ALSpospvalue <- ALSposfisher$p.value
+# HDpospvalue <- HDposfisher$p.value
+# RMSpospvalue <- RMSposfisher$p.value
+# PMSpospvalue<- PMSposfisher$p.value
+# Headachepospvalue<- Headacheposfisher$p.value
+# Epilepsypospvalue <- Epilepsyposfisher$p.value
+# TBIpospvalue <- TBIposfisher$p.value
+# 
+# Indicationvector2<-c("All Indications","Alzheimer's disease","Parkinson's disease","Amyotrophic lateral sclerosis","Huntington's disease","Relapsing Multiple sclerosis","Progressive multiple sclerosis","Headache","Epilepsy","TBI")
+# 
+# pospvalues<- c(Overallpospvalue, ADpospvalue, PDpospvalue, ALSpospvalue, HDpospvalue, RMSpospvalue, PMSpospvalue, Headachepospvalue, Epilepsypospvalue, TBIpospvalue)
+# 
+# termpvalues <- c(Overalltermpvalue, ADtermpvalue, PDtermpvalue, ALStermpvalue, HDtermpvalue, RMStermpvalue, PMStermpvalue, Headachetermpvalue, Epilepsytermpvalue, TBItermpvalue)
+#  
+# pvalues <- data.frame(Indication=rep(Indicationvector2),
+#                  Positivity_pvalues=rep(pospvalues),                 
+#                  Termination_pvalues=rep(termpvalues))
+# write.table(pvalues)
       
 ```
 
@@ -1123,7 +1139,14 @@ positivityandtermboth2 <- data.frame(Indication=rep(Indicationvector4),
                                     TBrates=rep(TBrate))
 
 write.table(positivityandtermboth2)
-
+table1 <- table(neurobypass$terminationcode, neurobypass$preceeded)
+table1
+Overalltermfisher <- fisher.test(table(neurobypass$terminationcode, neurobypass$preceeded))
+Overallposfisher <- fisher.test(table(Overallhasresults$positivityofP3, Overallhasresults$preceeded))
+Overalltermpvalue <- Overalltermfisher$p.value
+Overallpospvalue <- Overallposfisher$p.value
+Overallpospvalue
+Overalltermpvalue
 #Overalltermfisher2 <- prop.test((x = c(Overallprectermnumbernew,Overallbypasstermnumbernew)), (n = c(Overallpreceedfullcountnew,Overallbypasscountfullnew)), p = NULL, alternative ="two.sided",correct = TRUE)
 #Overallposfisher2 <- prop.test((x = c(Overallprecposnumbernew,Overallbypassposnumbernew)), (n = c(Overallpreceedcountnew,Overallbypasscountfullnew)), p = NULL, alternative ="two.sided",correct = TRUE)
 #Overalltermpvalue2 <- Overalltermfisher2$p.value
@@ -1132,6 +1155,7 @@ write.table(positivityandtermboth2)
 #pvaluesterm<-c(Overalltermpvalue,Overalltermpvalue2)
 
 ```
+
 
 ```{r, echo=FALSE, message = FALSE, warning=FALSE, include=FALSE}
 #patientnumbers and timing
