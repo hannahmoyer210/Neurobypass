@@ -429,6 +429,13 @@ Epilepsypospercent <- (divide_by(Epilepsyposcount,Epilepsyresultscount))*100
 TBIpospercent <- (divide_by(TBIposcount,TBIresultscount))*100
 Strokepospercent <- (divide_by(Strokeposcount,Strokeresultscount))*100
 
+Overallpreceednew <- subset(Overallhasresults, preceeded == "1")
+Overallpreceedcountnew <- nrow(Overallpreceednew)
+
+Overallprecedposnew <- subset(Overallpreceednew, positivityofP3 == "Positive")
+Overallprecposnumbernew <-nrow(Overallprecedposnew)
+Overallprecedpospercentnew <- (divide_by(Overallprecposnumbernew,Overallpreceedcountnew))*100
+
 #PROCEEDED
 #proceededpos
 Overallpreceed <- subset(Overallhasresults, preceeded == "1")
@@ -1154,6 +1161,30 @@ Overalltermpvalue
 #pvaluespos<-c(Overallpospvalue,Overallpospvalue2)
 #pvaluesterm<-c(Overalltermpvalue,Overalltermpvalue2)
 
+
+#sensitivity analysis 
+OverallpreceedSA <- subset(Overallhasresults, preceeded == "1")
+OverallpreceednewSA <- subset(OverallpreceedSA, preceeded == "1")
+OverallpreceedcountnewSA <- nrow(Overallpreceednew)
+
+OverallprecedposnewSA <- subset(OverallpreceednewSA, positivityofP3 == "Positive")
+OverallprecposnumbernewSA <-nrow(OverallprecedposnewSA)
+OverallprecedpospercentnewSA <- (divide_by(OverallprecposnumbernewSA,OverallpreceedcountnewSA))*100
+
+OverallnewSA <- subset(OverallpreceedSA, preceeded == "1")
+OverallpreceedcountnewSA <- nrow(Overallpreceednew)
+
+OverallprecedposnewSA <- subset(OverallpreceednewSA, positivityofP3 == "Positive")
+OverallprecposnumbernewSA <-nrow(OverallprecedposnewSA)
+OverallprecedpospercentnewSA <- (divide_by(OverallprecposnumbernewSA,OverallpreceedcountnewSA))*100
+
+OverallnewSA <- subset(Overallhasresults, sens == "1")
+table1<-table(OverallnewSA$positivityofP3, OverallnewSA$preceeded)
+table1
+OverallposfisherSA <- fisher.test(table(OverallnewSA$positivityofP3, OverallnewSA$preceeded))
+summary(OverallposfisherSA)
+OverallpospvalueSA <- OverallposfisherSA$p.value
+OverallpospvalueSA
 ```
 
 
@@ -1191,7 +1222,49 @@ Onlyphase3term<-subset(Onlyphase3, terminationcode=="1")
 summary(Onlyphase3term$Enrollment)
 summary(Onlyphase3term$time_difference)
 
+#hist bypass over time 
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(xml2)
 
+data(neurobypass)
+#need to make bins into years
+pdf("overtime.pdf", width=12, height=6)
+ggplot(
+    aes(
+        x = Startdate,
+        #need to change to bypass
+        y = preceeded
+    ),
+    data = neurobypass
+) +
+    geom_histogram(
+        position = "stack",
+        binwidth = 7
+    ) +
+    scale_x_date(
+        limits = c("2010-12-01","2021-12-30"),
+        minor_breaks = "1 year"
+    ) +
+    scale_fill_manual(
+        values = c(
+            "grey",
+            "#026B34"
+        ),
+    ) +
+    labs(
+        x = "Start date",
+        y = "Number of trials bypassing",
+        fill = "Why stopped",
+        title = paste(
+            "Trials that stopped per week during the first three",
+        )
+    ) +
+    theme(
+        legend.position = "bottom"
+    )
+dev.off()
 
 ```
 #write text 
