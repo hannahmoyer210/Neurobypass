@@ -1160,7 +1160,7 @@ Overalltermpvalue
 #Overallpospvalue2 <- Overallposfisher2$p.value
 #pvaluespos<-c(Overallpospvalue,Overallpospvalue2)
 #pvaluesterm<-c(Overalltermpvalue,Overalltermpvalue2)
-
+table(neurobypass$terminationcode, neurobypass$preceeded)
 
 #sensitivity analysis 
 OverallpreceedSA <- subset(Overallhasresults, preceeded == "1")
@@ -1185,6 +1185,12 @@ OverallposfisherSA <- fisher.test(table(OverallnewSA$positivityofP3, OverallnewS
 summary(OverallposfisherSA)
 OverallpospvalueSA <- OverallposfisherSA$p.value
 OverallpospvalueSA
+
+table(neurobypass$degenerative, neurobypass$preceeded)
+Overallfisherdegen <- fisher.test(table(neurobypass$degenerative, neurobypass$preceeded))
+summary(Overallfisherdegen)
+Overallfisherdegenp <- Overallfisherdegen$p.value
+Overallfisherdegenp
 ```
 
 
